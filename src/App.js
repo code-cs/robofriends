@@ -1,33 +1,40 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import CardList from './CardList';
 import SearchBox from './SearchBox';
-import {robots} from './robots';
+// import Scroll from './Scroll'
 
 
-class App extends Component {
-    constructor() {
-        super()
-        this.state ={
-            robots: robots,
-            searchfield: ''
-        }
+function App() {
+   //create a state
+    const [robots, setRobots]= useState([])
+    const [searchfield, setSearchField] =useState('')
+
+//everytime the app renders, it runs the useEffevt
+    useEffect(()=>{
+        fetch('https://jsonplaceholder.typicode.com/users')
+        .then(response => response.json())
+        .then(users => {setRobots(users)})
+    },[]) //componentDidMount is basically and empty arry'[]' in hooks
+
+   const  onSearchChange =(event) =>{
+        setSearchField(event.target.value)
     }
 
-    onSearchChange =(event) =>{
-        this.setState({searchfield:event.target.value})
-    }
-
-    render() {
-            const filterRobots = this.state.robots.filter(robots =>{
-        return robots.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
+    const filterRobots = robots.filter(robots =>{
+        return robots.name.toLowerCase().includes(searchfield.toLowerCase());
     })
-        return (
+    console.log(robots, searchfield)
+        return !robots.length ?
+        <h1>Loading</h1>:
+        (
                 <div className ='tc'>
                 <h1> RoboFriends</h1>
-                <SearchBox searchChange ={this.onSearchChange}/>
-                <CardList robots ={filterRobots}/> 
+                <SearchBox searchChange ={onSearchChange}/>
+                {/* <Scroll> */}
+                     <CardList robots ={filterRobots}/> 
+                {/* </Scroll> */}
                 </div>
             );
         }
-}
+
 export default App;
